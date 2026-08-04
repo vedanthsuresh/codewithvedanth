@@ -1,9 +1,13 @@
 # Vite
 .vite/
 dist/
+UserApplication/dist/
+AdminApp/dist/
 
 # Node
 node_modules/
+UserApplication/node_modules/
+AdminApp/node_modules/
 
 # Python
 API/.venv/
