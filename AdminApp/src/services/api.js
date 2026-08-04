@@ -44,44 +44,44 @@ class APIService {
 
   // Get all learning paths
   async getLearningPaths() {
-    return this.request('/lessons/paths');
+    return this.request('/modules/paths');
   }
 
-  // Get all lessons with optional filters
-  async getLessons(filters = {}) {
+  // Get all modules with optional filters
+  async getModules(filters = {}) {
     const params = new URLSearchParams();
     if (filters.path_id) params.append('path_id', filters.path_id);
     if (filters.age_range) params.append('age_range', filters.age_range);
     if (filters.difficulty) params.append('difficulty', filters.difficulty);
 
     const queryString = params.toString();
-    return this.request(`/lessons${queryString ? `?${queryString}` : ''}`);
+    return this.request(`/modules${queryString ? `?${queryString}` : ''}`);
   }
 
-  // Get single lesson by ID
-  async getLesson(id) {
-    return this.request(`/lessons/${id}`);
+  // Get single module by ID
+  async getModule(id) {
+    return this.request(`/modules/${id}`);
   }
 
-  // Create new lesson
-  async createLesson(lessonData) {
-    return this.request('/lessons', {
+  // Create new module
+  async createModule(moduleData) {
+    return this.request('/modules', {
       method: 'POST',
-      body: JSON.stringify(lessonData),
+      body: JSON.stringify(moduleData),
     });
   }
 
-  // Update lesson
-  async updateLesson(id, lessonData) {
-    return this.request(`/lessons/${id}`, {
+  // Update module
+  async updateModule(id, moduleData) {
+    return this.request(`/modules/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(lessonData),
+      body: JSON.stringify(moduleData),
     });
   }
 
-  // Delete lesson
-  async deleteLesson(id) {
-    return this.request(`/lessons/${id}`, {
+  // Delete module
+  async deleteModule(id) {
+    return this.request(`/modules/${id}`, {
       method: 'DELETE',
     });
   }

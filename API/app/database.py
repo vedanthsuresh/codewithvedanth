@@ -1,10 +1,10 @@
 from typing import List, Dict, Optional
-from app.models import Lesson, LearningPath
+from app.models import Module, LearningPath
 
 
-# Mock lessons data (3-5 lessons per path)
-MOCK_LESSONS: List[Dict] = [
-    # Python lessons
+# Mock modules data (3-5 modules per path)
+MOCK_MODULES: List[Dict] = [
+    # Python modules
     {
         "id": "py-001",
         "path_id": LearningPath.PYTHON,
@@ -74,7 +74,7 @@ MOCK_LESSONS: List[Dict] = [
         ],
         "prerequisites": ["py-003"]
     },
-    # Web Development lessons
+    # Web Development modules
     {
         "id": "web-001",
         "path_id": LearningPath.WEB_DEVELOPMENT,
@@ -143,7 +143,7 @@ MOCK_LESSONS: List[Dict] = [
         ],
         "prerequisites": ["web-003"]
     },
-    # Mobile Development lessons
+    # Mobile Development modules
     {
         "id": "mob-001",
         "path_id": LearningPath.MOBILE_DEVELOPMENT,
@@ -217,8 +217,8 @@ MOCK_LESSONS: List[Dict] = [
 
 class Database:
     def __init__(self):
-        self.lessons: Dict[str, Lesson] = {
-            lesson["id"]: Lesson(**lesson) for lesson in MOCK_LESSONS
+        self.modules: Dict[str, Module] = {
+            module["id"]: Module(**module) for module in MOCK_MODULES
         }
         self._path_counter = {
             LearningPath.PYTHON: 5,
@@ -226,38 +226,38 @@ class Database:
             LearningPath.MOBILE_DEVELOPMENT: 5
         }
 
-    def get_all_lessons(self) -> List[Lesson]:
-        return list(self.lessons.values())
+    def get_all_modules(self) -> List[Module]:
+        return list(self.modules.values())
 
-    def get_lesson_by_id(self, lesson_id: str) -> Optional[Lesson]:
-        return self.lessons.get(lesson_id)
+    def get_module_by_id(self, module_id: str) -> Optional[Module]:
+        return self.modules.get(module_id)
 
-    def get_lessons_by_path(self, path_id: LearningPath) -> List[Lesson]:
-        return [l for l in self.lessons.values() if l.path_id == path_id]
+    def get_modules_by_path(self, path_id: LearningPath) -> List[Module]:
+        return [m for m in self.modules.values() if m.path_id == path_id]
 
-    def create_lesson(self, lesson_data: dict, path_id: LearningPath) -> Lesson:
+    def create_module(self, module_data: dict, path_id: LearningPath) -> Module:
         # Generate ID based on path
         prefix = "py" if path_id == LearningPath.PYTHON else "web" if path_id == LearningPath.WEB_DEVELOPMENT else "mob"
         counter = self._path_counter[path_id]
-        lesson_id = f"{prefix}-{counter:03d}"
+        module_id = f"{prefix}-{counter:03d}"
         self._path_counter[path_id] = counter + 1
 
-        lesson = Lesson(id=lesson_id, **lesson_data)
-        self.lessons[lesson_id] = lesson
-        return lesson
+        module = Module(id=module_id, **module_data)
+        self.modules[module_id] = module
+        return module
 
-    def update_lesson(self, lesson_id: str, updates: dict) -> Optional[Lesson]:
-        if lesson_id not in self.lessons:
+    def update_module(self, module_id: str, updates: dict) -> Optional[Module]:
+        if module_id not in self.modules:
             return None
-        lesson = self.lessons[lesson_id]
+        module = self.modules[module_id]
         for key, value in updates.items():
-            if value is not None and hasattr(lesson, key):
-                setattr(lesson, key, value)
-        return lesson
+            if value is not None and hasattr(module, key):
+                setattr(module, key, value)
+        return module
 
-    def delete_lesson(self, lesson_id: str) -> bool:
-        if lesson_id in self.lessons:
-            del self.lessons[lesson_id]
+    def delete_module(self, module_id: str) -> bool:
+        if module_id in self.modules:
+            del self.modules[module_id]
             return True
         return False
 

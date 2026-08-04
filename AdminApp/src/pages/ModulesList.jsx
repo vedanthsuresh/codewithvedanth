@@ -35,9 +35,9 @@ const difficultyInfo = {
   advanced: { name: 'Advanced', emoji: '🌳', color: 'from-red-400 to-red-500' },
 };
 
-export default function LessonsList() {
-  const [lessons, setLessons] = useState([]);
-  const [filteredLessons, setFilteredLessons] = useState([]);
+export default function ModulesList() {
+  const [modules, setModules] = useState([]);
+  const [filteredLessons, setFilteredModules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
@@ -46,12 +46,12 @@ export default function LessonsList() {
     difficulty: ''
   });
 
-  const loadLessons = async () => {
+  const loadModules = async () => {
     try {
       setLoading(true);
-      const data = await api.getLessons(filters);
-      setLessons(data);
-      setFilteredLessons(data);
+      const data = await api.getModules(filters);
+      setModules(data);
+      setFilteredModules(data);
       setError(null);
     } catch (err) {
       setError(err.message);
@@ -61,11 +61,11 @@ export default function LessonsList() {
   };
 
   useEffect(() => {
-    loadLessons();
+    loadModules();
   }, []);
 
   useEffect(() => {
-    let filtered = lessons;
+    let filtered = modules;
     if (filters.path_id) {
       filtered = filtered.filter(l => l.path_id === filters.path_id);
     }
@@ -75,14 +75,14 @@ export default function LessonsList() {
     if (filters.difficulty) {
       filtered = filtered.filter(l => l.difficulty_level === filters.difficulty);
     }
-    setFilteredLessons(filtered);
-  }, [filters, lessons]);
+    setFilteredModules(filtered);
+  }, [filters, modules]);
 
   const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this lesson?')) return;
+    if (!confirm('Are you sure you want to delete this module?')) return;
     try {
-      await api.deleteLesson(id);
-      setLessons(lessons.filter(l => l.id !== id));
+      await api.deleteModule(id);
+      setModules(modules.filter(l => l.id !== id));
     } catch (err) {
       alert(`Failed to delete: ${err.message}`);
     }
@@ -95,7 +95,7 @@ export default function LessonsList() {
           <div className="w-16 h-16 border-4 border-gray-200 rounded-full"></div>
           <div className="absolute top-0 left-0 w-16 h-16 border-4 border-purple-500 rounded-full border-t-transparent animate-spin"></div>
         </div>
-        <p className="text-gray-500 font-medium">Loading lessons...</p>
+        <p className="text-gray-500 font-medium">Loading modules...</p>
       </div>
     );
   }
@@ -106,10 +106,10 @@ export default function LessonsList() {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Lessons</h1>
-          <p className="text-gray-500 mt-1">Manage your lesson content and settings</p>
+          <p className="text-gray-500 mt-1">Manage your module content and settings</p>
         </div>
         <Link
-          to="/lessons/new"
+          to="/modules/new"
           className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-medium rounded-xl shadow-lg hover:shadow-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 active:scale-[0.98]"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -173,7 +173,7 @@ export default function LessonsList() {
             </div>
           </div>
           <p className="text-sm text-gray-500 mt-4">
-            Showing <span className="font-semibold text-gray-700">{filteredLessons.length}</span> of <span className="font-semibold text-gray-700">{lessons.length}</span> lessons
+            Showing <span className="font-semibold text-gray-700">{filteredLessons.length}</span> of <span className="font-semibold text-gray-700">{modules.length}</span> modules
           </p>
         </div>
       </div>
@@ -191,12 +191,12 @@ export default function LessonsList() {
       {/* Lessons Grid */}
       {filteredLessons.length > 0 ? (
         <div className="grid gap-4">
-          {filteredLessons.map((lesson) => {
-            const path = pathInfo[lesson.path_id] || pathInfo[LearningPaths.PYTHON];
-            const difficulty = difficultyInfo[lesson.difficulty_level] || difficultyInfo.beginner;
+          {filteredLessons.map((module) => {
+            const path = pathInfo[module.path_id] || pathInfo[LearningPaths.PYTHON];
+            const difficulty = difficultyInfo[module.difficulty_level] || difficultyInfo.beginner;
             return (
               <div
-                key={lesson.id}
+                key={module.id}
                 className="card group hover:shadow-md transition-all duration-200"
               >
                 <div className="p-6">
@@ -215,13 +215,13 @@ export default function LessonsList() {
                         </div>
                         <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200">
                           <span>🎂</span>
-                          <span>{lesson.age_range} years</span>
+                          <span>{module.age_range} years</span>
                         </div>
                       </div>
 
                       {/* Title & Description */}
-                      <h3 className="text-xl font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">{lesson.title}</h3>
-                      <p className="text-gray-600 mt-2 line-clamp-2">{lesson.description}</p>
+                      <h3 className="text-xl font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">{module.title}</h3>
+                      <p className="text-gray-600 mt-2 line-clamp-2">{module.description}</p>
 
                       {/* Meta Info */}
                       <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-gray-500">
@@ -229,19 +229,19 @@ export default function LessonsList() {
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          <span>{lesson.duration_minutes} minutes</span>
+                          <span>{module.duration_minutes} minutes</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          <span>${lesson.price_on_one} / ${lesson.price_group}</span>
+                          <span>${module.price_on_one} / ${module.price_group}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          <span>{lesson.objectives?.length || 0} objectives</span>
+                          <span>{module.objectives?.length || 0} objectives</span>
                         </div>
                       </div>
                     </div>
@@ -249,7 +249,7 @@ export default function LessonsList() {
                     {/* Actions */}
                     <div className="flex items-center gap-2 lg:ml-4">
                       <Link
-                        to={`/lessons/${lesson.id}/edit`}
+                        to={`/modules/${module.id}/edit`}
                         className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 font-medium rounded-xl hover:bg-blue-100 transition-colors"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -258,7 +258,7 @@ export default function LessonsList() {
                         Edit
                       </Link>
                       <button
-                        onClick={() => handleDelete(lesson.id)}
+                        onClick={() => handleDelete(module.id)}
                         className="inline-flex items-center gap-2 px-4 py-2 bg-red-50 text-red-700 font-medium rounded-xl hover:bg-red-100 transition-colors"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -281,10 +281,10 @@ export default function LessonsList() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">No lessons found</h3>
-            <p className="text-gray-500 mb-4">Create your first lesson to get started</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">No modules found</h3>
+            <p className="text-gray-500 mb-4">Create your first module to get started</p>
             <Link
-              to="/lessons/new"
+              to="/modules/new"
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-medium rounded-xl shadow-lg hover:shadow-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,12 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
-from app.routers import lessons
+from app.routers import modules
 
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    description="API for Vedanth's Coding Classes - Lessons and Student Portal"
+    description="API for Vedanth's Coding Classes - Modules and Student Portal"
 )
 
 # CORS middleware
@@ -19,7 +19,7 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(lessons.router)
+app.include_router(modules.router)
 
 
 @app.get("/")
@@ -29,7 +29,7 @@ async def root():
         "version": settings.APP_VERSION,
         "docs": "/docs",
         "endpoints": {
-            "lessons": "/lessons",
+            "modules": "/modules",
             "health": "/health"
         }
     }

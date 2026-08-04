@@ -4,15 +4,15 @@ export default function Layout({ children }) {
   const location = useLocation();
 
   const isActive = (path) => {
-    if (path === '/lessons') {
-      return location.pathname === '/' || location.pathname.startsWith('/lessons');
+    if (path === '/modules') {
+      return location.pathname === '/' || location.pathname.startsWith('/modules');
     }
     return location.pathname === path;
   };
 
   const navItems = [
-    { path: '/lessons', label: 'Lessons', icon: '📚' },
-    { path: '/lessons/new', label: 'New Lesson', icon: '➕' },
+    { path: '/modules', label: 'Modules', icon: '📚' },
+    { path: '/modules/new', label: 'New Module', icon: '➕' },
   ];
 
   return (
@@ -22,7 +22,7 @@ export default function Layout({ children }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <Link to="/lessons" className="flex items-center gap-3 group">
+            <Link to="/modules" className="flex items-center gap-3 group">
               <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-200">
                 <span className="text-xl">📚</span>
               </div>

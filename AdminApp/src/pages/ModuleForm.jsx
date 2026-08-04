@@ -14,7 +14,7 @@ const difficultyInfo = {
   advanced: { name: 'Advanced', emoji: '🌳' },
 };
 
-export default function LessonForm() {
+export default function ModuleForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
@@ -38,13 +38,13 @@ export default function LessonForm() {
 
   useEffect(() => {
     if (isEditing) {
-      loadLesson();
+      loadModule();
     }
   }, [id]);
 
-  const loadLesson = async () => {
+  const loadModule = async () => {
     try {
-      const data = await api.getLesson(id);
+      const data = await api.getModule(id);
       setFormData(data);
     } catch (err) {
       setError(err.message);
@@ -66,11 +66,11 @@ export default function LessonForm() {
 
     try {
       if (isEditing) {
-        await api.updateLesson(id, cleanedData);
+        await api.updateModule(id, cleanedData);
       } else {
-        await api.createLesson(cleanedData);
+        await api.createModule(cleanedData);
       }
-      navigate('/lessons');
+      navigate('/modules');
     } catch (err) {
       setError(err.message);
       setSubmitting(false);
@@ -114,7 +114,7 @@ export default function LessonForm() {
           <div className="w-16 h-16 border-4 border-gray-200 rounded-full"></div>
           <div className="absolute top-0 left-0 w-16 h-16 border-4 border-purple-500 rounded-full border-t-transparent animate-spin"></div>
         </div>
-        <p className="text-gray-500 font-medium">Loading lesson...</p>
+        <p className="text-gray-500 font-medium">Loading module...</p>
       </div>
     );
   }
@@ -128,11 +128,11 @@ export default function LessonForm() {
             {isEditing ? 'Edit Lesson' : 'Create New Lesson'}
           </h1>
           <p className="text-gray-500 mt-1">
-            {isEditing ? 'Update lesson details and content' : 'Fill in the details to create a new lesson'}
+            {isEditing ? 'Update module details and content' : 'Fill in the details to create a new module'}
           </p>
         </div>
         <Link
-          to="/lessons"
+          to="/modules"
           className="inline-flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 font-medium rounded-xl hover:bg-gray-100 transition-all duration-200"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -217,7 +217,7 @@ export default function LessonForm() {
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={4}
               className="input-base resize-none"
-              placeholder="Provide a brief description of what students will learn in this lesson..."
+              placeholder="Provide a brief description of what students will learn in this module..."
               required
             />
           </div>
@@ -423,7 +423,7 @@ export default function LessonForm() {
           {/* Actions */}
           <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200">
             <Link
-              to="/lessons"
+              to="/modules"
               className="inline-flex items-center justify-center px-6 py-2.5 font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200"
             >
               Cancel

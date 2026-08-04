@@ -9,12 +9,12 @@ class LearningPath(str, Enum):
     MOBILE_DEVELOPMENT = "mobile_development"
 
 
-class LessonBase(BaseModel):
+class ModuleBase(BaseModel):
     path_id: LearningPath
     title: str
     description: str
     age_range: str = Field(..., description="e.g., '6-9' or '10-12'")
-    duration_minutes: int = Field(default=45)
+    duration_minutes: int = Field(default=45, description="Estimated duration in minutes (guideline, not fixed)")
     price_on_one: float = Field(default=10.0)
     price_group: float = Field(default=8.0)
     difficulty_level: str = Field(..., description="beginner, intermediate, or advanced")
@@ -22,11 +22,11 @@ class LessonBase(BaseModel):
     prerequisites: List[str] = []
 
 
-class LessonCreate(LessonBase):
+class ModuleCreate(ModuleBase):
     pass
 
 
-class LessonUpdate(BaseModel):
+class ModuleUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
     age_range: Optional[str] = None
@@ -35,7 +35,7 @@ class LessonUpdate(BaseModel):
     prerequisites: Optional[List[str]] = None
 
 
-class Lesson(LessonBase):
+class Module(ModuleBase):
     id: str
 
     class Config:
