@@ -37,7 +37,7 @@ const difficultyInfo = {
 
 export default function ModulesList() {
   const [modules, setModules] = useState([]);
-  const [filteredLessons, setFilteredModules] = useState([]);
+  const [filteredModules, setFilteredModules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
@@ -105,7 +105,7 @@ export default function ModulesList() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Lessons</h1>
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Modules</h1>
           <p className="text-gray-500 mt-1">Manage your module content and settings</p>
         </div>
         <Link
@@ -115,7 +115,7 @@ export default function ModulesList() {
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          Create Lesson
+          Create Module
         </Link>
       </div>
 
@@ -173,7 +173,7 @@ export default function ModulesList() {
             </div>
           </div>
           <p className="text-sm text-gray-500 mt-4">
-            Showing <span className="font-semibold text-gray-700">{filteredLessons.length}</span> of <span className="font-semibold text-gray-700">{modules.length}</span> modules
+            Showing <span className="font-semibold text-gray-700">{filteredModules.length}</span> of <span className="font-semibold text-gray-700">{modules.length}</span> modules
           </p>
         </div>
       </div>
@@ -189,9 +189,9 @@ export default function ModulesList() {
       )}
 
       {/* Lessons Grid */}
-      {filteredLessons.length > 0 ? (
+      {filteredModules.length > 0 ? (
         <div className="grid gap-4">
-          {filteredLessons.map((module) => {
+          {filteredModules.map((module) => {
             const path = pathInfo[module.path_id] || pathInfo[LearningPaths.PYTHON];
             const difficulty = difficultyInfo[module.difficulty_level] || difficultyInfo.beginner;
             return (
@@ -290,7 +290,7 @@ export default function ModulesList() {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              Create Lesson
+              Create Module
             </Link>
           </div>
         </div>
