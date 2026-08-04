@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from enum import Enum
-from sqlalchemy import Column, String, Integer, Float, JSON
+from sqlalchemy import Column, String, JSON
 from sqlalchemy.ext.declarative import declarative_base
 
 # Pydantic models for API
@@ -15,9 +15,6 @@ class ModuleBase(BaseModel):
     path_id: LearningPath
     title: str
     description: str
-    duration_minutes: int = Field(default=45, description="Estimated duration in minutes (guideline, not fixed)")
-    price_on_one: float = Field(default=10.0)
-    price_group: float = Field(default=8.0)
     difficulty_level: str = Field(..., description="beginner, intermediate, or advanced")
     objectives: List[str]
     prerequisites: List[str] = []
@@ -62,9 +59,6 @@ class ModuleORM(Base):
     path_id = Column(String, nullable=False, index=True)
     title = Column(String, nullable=False)
     description = Column(String, nullable=False)
-    duration_minutes = Column(Integer, nullable=False, default=45)
-    price_on_one = Column(Float, nullable=False, default=10.0)
-    price_group = Column(Float, nullable=False, default=8.0)
     difficulty_level = Column(String, nullable=False)
     objectives = Column(JSON, nullable=False, default=list)
     prerequisites = Column(JSON, nullable=False, default=list)
@@ -76,9 +70,6 @@ class ModuleORM(Base):
             path_id=self.path_id,
             title=self.title,
             description=self.description,
-            duration_minutes=self.duration_minutes,
-            price_on_one=self.price_on_one,
-            price_group=self.price_group,
             difficulty_level=self.difficulty_level,
             objectives=self.objectives or [],
             prerequisites=self.prerequisites or []
@@ -92,9 +83,6 @@ class ModuleORM(Base):
             path_id=module.path_id,
             title=module.title,
             description=module.description,
-            duration_minutes=module.duration_minutes,
-            price_on_one=module.price_on_one,
-            price_group=module.price_group,
             difficulty_level=module.difficulty_level,
             objectives=module.objectives,
             prerequisites=module.prerequisites

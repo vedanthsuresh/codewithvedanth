@@ -15,9 +15,6 @@ SAMPLE_MODULES = [
         "path_id": "python",
         "title": "Introduction to Python",
         "description": "Learn the basics of Python programming, including variables, data types, and simple operations.",
-        "duration_minutes": 45,
-        "price_on_one": 10.0,
-        "price_group": 8.0,
         "difficulty_level": "beginner",
         "objectives": [
             "Understand variables and how to use them",
@@ -32,9 +29,6 @@ SAMPLE_MODULES = [
         "path_id": "python",
         "title": "Python Loops and Logic",
         "description": "Master loops, conditionals, and logical thinking in Python.",
-        "duration_minutes": 45,
-        "price_on_one": 10.0,
-        "price_group": 8.0,
         "difficulty_level": "beginner",
         "objectives": [
             "Understand if/else statements",
@@ -48,9 +42,6 @@ SAMPLE_MODULES = [
         "path_id": "python",
         "title": "Functions and Modular Code",
         "description": "Learn how to write reusable code using functions.",
-        "duration_minutes": 45,
-        "price_on_one": 10.0,
-        "price_group": 8.0,
         "difficulty_level": "intermediate",
         "objectives": [
             "Define and call functions",
@@ -65,9 +56,6 @@ SAMPLE_MODULES = [
         "path_id": "web_development",
         "title": "HTML Basics",
         "description": "Learn the building blocks of web pages with HTML.",
-        "duration_minutes": 45,
-        "price_on_one": 10.0,
-        "price_group": 8.0,
         "difficulty_level": "beginner",
         "objectives": [
             "Understand HTML tags and structure",
@@ -81,9 +69,6 @@ SAMPLE_MODULES = [
         "path_id": "web_development",
         "title": "CSS Styling",
         "description": "Make your web pages beautiful with CSS.",
-        "duration_minutes": 45,
-        "price_on_one": 10.0,
-        "price_group": 8.0,
         "difficulty_level": "beginner",
         "objectives": [
             "Add colors and fonts to your pages",
@@ -98,9 +83,6 @@ SAMPLE_MODULES = [
         "path_id": "mobile_development",
         "title": "Introduction to Mobile Apps",
         "description": "Learn what mobile apps are and how they work.",
-        "duration_minutes": 45,
-        "price_on_one": 10.0,
-        "price_group": 8.0,
         "difficulty_level": "beginner",
         "objectives": [
             "Understand mobile app concepts",

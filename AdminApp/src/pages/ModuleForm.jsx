@@ -27,9 +27,6 @@ export default function ModuleForm() {
     path_id: LearningPaths.PYTHON,
     title: '',
     description: '',
-    duration_minutes: 45,
-    price_on_one: 10,
-    price_group: 8,
     difficulty_level: 'beginner',
     objectives: [''],
     prerequisites: []
@@ -221,77 +218,21 @@ export default function ModuleForm() {
             />
           </div>
 
-          {/* Duration, Difficulty */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Duration (min) <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                value={formData.duration_minutes}
-                onChange={(e) => setFormData({ ...formData, duration_minutes: parseInt(e.target.value) })}
-                className="input-base"
-                min="15"
-                step="5"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Difficulty <span className="text-red-500">*</span>
-              </label>
-              <select
-                value={formData.difficulty_level}
-                onChange={(e) => setFormData({ ...formData, difficulty_level: e.target.value })}
-                className="select-base"
-                required
-              >
-                {Object.entries(difficultyInfo).map(([key, info]) => (
-                  <option key={key} value={key}>{info.emoji} {info.name}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Pricing */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                1-on-1 Price ($) <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">$</span>
-                <input
-                  type="number"
-                  value={formData.price_on_one}
-                  onChange={(e) => setFormData({ ...formData, price_on_one: parseFloat(e.target.value) })}
-                  className="input-base pl-8"
-                  min="0"
-                  step="1"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Group Price ($) <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium">$</span>
-                <input
-                  type="number"
-                  value={formData.price_group}
-                  onChange={(e) => setFormData({ ...formData, price_group: parseFloat(e.target.value) })}
-                  className="input-base pl-8"
-                  min="0"
-                  step="1"
-                  required
-                />
-              </div>
-            </div>
+          {/* Difficulty */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Difficulty Level <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={formData.difficulty_level}
+              onChange={(e) => setFormData({ ...formData, difficulty_level: e.target.value })}
+              className="select-base"
+              required
+            >
+              {Object.entries(difficultyInfo).map(([key, info]) => (
+                <option key={key} value={key}>{info.emoji} {info.name}</option>
+              ))}
+            </select>
           </div>
 
           {/* Learning Objectives */}
