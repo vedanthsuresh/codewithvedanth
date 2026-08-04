@@ -10,9 +10,6 @@ export const LearningPaths = {
 // Difficulty levels
 export const DifficultyLevels = ['beginner', 'intermediate', 'advanced'];
 
-// Age ranges
-export const AgeRanges = ['6-9', '8-12', '10-12'];
-
 class APIService {
   async request(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
@@ -51,7 +48,6 @@ class APIService {
   async getModules(filters = {}) {
     const params = new URLSearchParams();
     if (filters.path_id) params.append('path_id', filters.path_id);
-    if (filters.age_range) params.append('age_range', filters.age_range);
     if (filters.difficulty) params.append('difficulty', filters.difficulty);
 
     const queryString = params.toString();

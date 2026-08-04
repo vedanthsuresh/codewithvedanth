@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { api, LearningPaths, DifficultyLevels, AgeRanges } from '../services/api';
+import { api, LearningPaths, DifficultyLevels } from '../services/api';
 
 const pathInfo = {
   [LearningPaths.PYTHON]: {
@@ -42,7 +42,6 @@ export default function ModulesList() {
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
     path_id: '',
-    age_range: '',
     difficulty: ''
   });
 
@@ -68,9 +67,6 @@ export default function ModulesList() {
     let filtered = modules;
     if (filters.path_id) {
       filtered = filtered.filter(l => l.path_id === filters.path_id);
-    }
-    if (filters.age_range) {
-      filtered = filtered.filter(l => l.age_range === filters.age_range);
     }
     if (filters.difficulty) {
       filtered = filtered.filter(l => l.difficulty_level === filters.difficulty);
@@ -125,13 +121,13 @@ export default function ModulesList() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
             <button
-              onClick={() => setFilters({ path_id: '', age_range: '', difficulty: '' })}
+              onClick={() => setFilters({ path_id: '', difficulty: '' })}
               className="text-sm text-purple-600 hover:text-purple-700 font-medium transition-colors"
             >
               Clear All
             </button>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Learning Path</label>
               <select
@@ -142,19 +138,6 @@ export default function ModulesList() {
                 <option value="">All Paths</option>
                 {Object.entries(pathInfo).map(([key, info]) => (
                   <option key={key} value={key}>{info.emoji} {info.name}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Age Range</label>
-              <select
-                value={filters.age_range}
-                onChange={(e) => setFilters({ ...filters, age_range: e.target.value })}
-                className="select-base"
-              >
-                <option value="">All Ages</option>
-                {AgeRanges.map(range => (
-                  <option key={range} value={range}>{range} years</option>
                 ))}
               </select>
             </div>
@@ -188,7 +171,7 @@ export default function ModulesList() {
         </div>
       )}
 
-      {/* Lessons Grid */}
+      {/* Modules Grid */}
       {filteredModules.length > 0 ? (
         <div className="grid gap-4">
           {filteredModules.map((module) => {
@@ -212,10 +195,6 @@ export default function ModulesList() {
                         <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r ${difficulty.color} text-white`}>
                           <span>{difficulty.emoji}</span>
                           <span>{difficulty.name}</span>
-                        </div>
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200">
-                          <span>🎂</span>
-                          <span>{module.age_range} years</span>
                         </div>
                       </div>
 

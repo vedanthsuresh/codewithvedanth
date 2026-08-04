@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { api, LearningPaths, DifficultyLevels, AgeRanges } from '../services/api';
+import { api, LearningPaths, DifficultyLevels } from '../services/api';
 
 const pathInfo = {
   [LearningPaths.PYTHON]: { name: 'Python', emoji: '🐍' },
@@ -27,7 +27,6 @@ export default function ModuleForm() {
     path_id: LearningPaths.PYTHON,
     title: '',
     description: '',
-    age_range: '6-9',
     duration_minutes: 45,
     price_on_one: 10,
     price_group: 8,
@@ -222,24 +221,8 @@ export default function ModuleForm() {
             />
           </div>
 
-          {/* Age Range, Duration, Difficulty */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Age Range <span className="text-red-500">*</span>
-              </label>
-              <select
-                value={formData.age_range}
-                onChange={(e) => setFormData({ ...formData, age_range: e.target.value })}
-                className="select-base"
-                required
-              >
-                {AgeRanges.map(range => (
-                  <option key={range} value={range}>{range} years</option>
-                ))}
-              </select>
-            </div>
-
+          {/* Duration, Difficulty */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Duration (min) <span className="text-red-500">*</span>
