@@ -133,12 +133,24 @@ async function handleCancelledBooking(bookingId, bookingData, previousData) {
   try {
     logger.info(`Sending cancellation email for booking ${bookingId}`);
 
-    // Send cancellation email
+    // Fetch time slot details for date/time
+    const slotRef = db.collection('time_slots').doc(bookingData.time_slot_id);
+    const slotSnap = await slotRef.get();
+
+    let slotData = {};
+    if (slotSnap.exists) {
+      slotData = slotSnap.data();
+      logger.info(`Retrieved time slot: ${slotData.date} at ${slotData.time}`);
+    } else {
+      logger.warn(`Time slot ${bookingData.time_slot_id} not found for booking ${bookingId}`);
+    }
+
+    // Send cancellation email with slot date/time
     const result = await sendCancellationEmail({
       student_email: bookingData.student_email,
       student_name: bookingData.student_name,
-      date: bookingData.date,
-      time: bookingData.time,
+      date: slotData.date || null,
+      time: slotData.time || null,
     });
 
     if (result.success) {
