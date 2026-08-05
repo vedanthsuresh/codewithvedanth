@@ -1,6 +1,9 @@
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function Navbar() {
+  const { user } = useAuth();
+
   return (
     <nav className="bg-gray-900 shadow-md sticky top-0 z-50 border-b border-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -36,14 +39,32 @@ export default function Navbar() {
                 About
               </Link>
             </li>
-            <li>
-              <Link
-                to="/login"
-                className="text-gray-300 font-medium hover:text-purple-400 transition-colors duration-300"
-              >
-                Login
-              </Link>
-            </li>
+            {user ? (
+              <>
+                <li>
+                  <Link
+                    to="/account"
+                    className="text-gray-300 font-medium hover:text-purple-400 transition-colors duration-300"
+                  >
+                    My Account
+                  </Link>
+                </li>
+                <li>
+                  <span className="text-gray-400 text-sm">
+                    {user.displayName || user.email?.split('@')[0]}
+                  </span>
+                </li>
+              </>
+            ) : (
+              <li>
+                <Link
+                  to="/login"
+                  className="text-gray-300 font-medium hover:text-purple-400 transition-colors duration-300"
+                >
+                  Login
+                </Link>
+              </li>
+            )}
             <li>
               <Link
                 to="/book-trial"
@@ -56,5 +77,5 @@ export default function Navbar() {
         </div>
       </div>
     </nav>
-  )
+  );
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { api } from '../services/api';
+import { firestoreService as api } from '../services/firestore';
 
 export default function BookingsList() {
   const [bookings, setBookings] = useState([]);
@@ -47,6 +47,7 @@ export default function BookingsList() {
   };
 
   const formatDate = (dateStr) => {
+    // Parse ISO datetime string
     const date = new Date(dateStr);
     return date.toLocaleDateString('en-US', {
       month: 'short',
@@ -59,7 +60,9 @@ export default function BookingsList() {
 
   const formatSlotDate = (dateStr, timeStr) => {
     if (dateStr === 'N/A') return 'N/A';
-    const date = new Date(dateStr);
+    // Parse the date string as local time (not UTC) to avoid timezone offset issues
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
     const [hours, minutes] = timeStr.split(':');
     const hour = parseInt(hours);
     const ampm = hour >= 12 ? 'PM' : 'AM';

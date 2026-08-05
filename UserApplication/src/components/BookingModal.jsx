@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
-import { api } from '../services/api';
+import { firestoreService as api } from '../services/firestore';
 
 // X icon as inline SVG
 const XIcon = () => (
@@ -75,7 +75,9 @@ export default function BookingModal({ isOpen, onClose }) {
   };
 
   const formatDate = (dateStr) => {
-    const date = new Date(dateStr);
+    // Parse the date string as local time (not UTC) to avoid timezone offset issues
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
     return date.toLocaleDateString('en-US', {
       weekday: 'long',
       month: 'long',

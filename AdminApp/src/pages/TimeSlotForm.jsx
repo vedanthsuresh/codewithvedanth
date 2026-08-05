@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { api } from '../services/api';
+import { firestoreService as api } from '../services/firestore';
 
 export default function TimeSlotForm() {
   const { id } = useParams();
@@ -44,7 +44,11 @@ export default function TimeSlotForm() {
     setError(null);
 
     // Validate date is in the future
-    const slotDate = new Date(formData.date);
+    // Parse the date string as local time (not UTC) to avoid timezone offset issues
+    const [year, month, day] = formData.date.split('-').map(Number);
+    const slotDate = new Date(year, month - 1, day);
+    slotDate.setHours(0, 0, 0, 0);
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 

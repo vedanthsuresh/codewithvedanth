@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { api, LearningPaths, DifficultyLevels } from '../services/api';
+import { firestoreService as api, LearningPaths, DifficultyLevels } from '../services/firestore';
 
 const pathInfo = {
   [LearningPaths.PYTHON]: { name: 'Python', emoji: '🐍' },

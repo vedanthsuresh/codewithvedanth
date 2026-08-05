@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { api, LearningPaths } from '../services/api';
+import { firestoreService as api, LearningPaths } from '../services/firestore';
 
 // Animation variants
 const fadeInUp = {

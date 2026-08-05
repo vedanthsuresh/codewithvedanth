@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { api } from '../services/api';
+import { firestoreService as api } from '../services/firestore';
 
 export default function Account() {
   const { user, logout } = useAuth();
@@ -15,12 +15,12 @@ export default function Account() {
 
   const loadUserBookings = async () => {
     try {
-      // For now, we'll load all bookings since we don't have a user-specific endpoint yet
-      // In production, you'd filter by user_id
-      const data = await api.getAvailableTimeSlots();
-      setBookings([]); // Reset until we have user-specific endpoint
+      // Use the Firestore service to get user bookings
+      const data = await api.getUserBookings(user.uid);
+      setBookings(data);
     } catch (err) {
       console.error('Failed to load bookings:', err);
+      setBookings([]);
     } finally {
       setLoading(false);
     }
@@ -36,7 +36,10 @@ export default function Account() {
   };
 
   const formatDate = (dateStr) => {
-    return new Date(dateStr).toLocaleDateString('en-US', {
+    // Parse the date string as local time (not UTC) to avoid timezone offset issues
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    return date.toLocaleDateString('en-US', {
       month: 'long',
       day: 'numeric',
       year: 'numeric'

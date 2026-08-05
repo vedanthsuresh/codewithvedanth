@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { api, LearningPaths } from '../services/api';
+import { firestoreService as api, LearningPaths } from '../services/firestore';
 
 const pathInfo = {
   [LearningPaths.PYTHON]: {
