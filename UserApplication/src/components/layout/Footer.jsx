@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 export default function Footer() {
   return (
     <footer className="bg-gradient-to-br from-indigo-950 to-purple-950 text-white py-12 px-8 mt-auto">
@@ -17,9 +19,9 @@ export default function Footer() {
           <h3 className="text-lg font-semibold mb-4 text-purple-400">Quick Links</h3>
           <ul className="list-none p-0 m-0">
             <li className="mb-2">
-              <a href="/lessons" className="text-gray-300 hover:text-purple-400 transition-colors duration-300">
-                Lessons
-              </a>
+              <Link to="/syllabus" className="text-gray-300 hover:text-purple-400 transition-colors duration-300">
+                Syllabus
+              </Link>
             </li>
             <li className="mb-2">
               <a href="/about" className="text-gray-300 hover:text-purple-400 transition-colors duration-300">

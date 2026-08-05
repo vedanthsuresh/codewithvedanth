@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { api, LearningPaths, DifficultyLevels } from '../services/api';
+import { api, LearningPaths } from '../services/api';
 
 const pathInfo = {
   [LearningPaths.PYTHON]: {
@@ -29,29 +29,39 @@ const pathInfo = {
   },
 };
 
-const difficultyInfo = {
-  beginner: { name: 'Beginner', emoji: '🌱', color: 'from-green-400 to-green-500' },
-  intermediate: { name: 'Intermediate', emoji: '🌿', color: 'from-amber-400 to-amber-500' },
-  advanced: { name: 'Advanced', emoji: '🌳', color: 'from-red-400 to-red-500' },
-};
-
-export default function ModulesList() {
-  const [modules, setModules] = useState([]);
-  const [filteredModules, setFilteredModules] = useState([]);
+export default function UnitsList() {
+  const [units, setUnits] = useState([]);
+  const [filteredUnits, setFilteredUnits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
-    path_id: '',
-    difficulty: ''
+    path_id: ''
   });
+  const [unitModuleCounts, setUnitModuleCounts] = useState({});
 
-  const loadModules = async () => {
+  const loadUnits = async () => {
     try {
       setLoading(true);
-      const data = await api.getModules(filters);
-      setModules(data);
-      setFilteredModules(data);
+      const data = await api.getUnits(filters);
+      setUnits(data);
+      setFilteredUnits(data);
       setError(null);
+
+      // Fetch module counts for each unit
+      const countsPromises = data.map(async (unit) => {
+        try {
+          const modules = await api.getUnitModules(unit.id);
+          return { unitId: unit.id, count: modules.length };
+        } catch {
+          return { unitId: unit.id, count: 0 };
+        }
+      });
+      const counts = await Promise.all(countsPromises);
+      const countsMap = {};
+      counts.forEach(({ unitId, count }) => {
+        countsMap[unitId] = count;
+      });
+      setUnitModuleCounts(countsMap);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -60,25 +70,15 @@ export default function ModulesList() {
   };
 
   useEffect(() => {
-    loadModules();
-  }, []);
-
-  useEffect(() => {
-    let filtered = modules;
-    if (filters.path_id) {
-      filtered = filtered.filter(l => l.path_id === filters.path_id);
-    }
-    if (filters.difficulty) {
-      filtered = filtered.filter(l => l.difficulty_level === filters.difficulty);
-    }
-    setFilteredModules(filtered);
-  }, [filters, modules]);
+    loadUnits();
+  }, [filters]);
 
   const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this module?')) return;
+    if (!confirm('Are you sure you want to delete this unit? Modules will not be deleted.')) return;
     try {
-      await api.deleteModule(id);
-      setModules(modules.filter(l => l.id !== id));
+      await api.deleteUnit(id);
+      setUnits(units.filter(u => u.id !== id));
+      setFilteredUnits(filteredUnits.filter(u => u.id !== id));
     } catch (err) {
       alert(`Failed to delete: ${err.message}`);
     }
@@ -91,7 +91,7 @@ export default function ModulesList() {
           <div className="w-16 h-16 border-4 border-gray-200 rounded-full"></div>
           <div className="absolute top-0 left-0 w-16 h-16 border-4 border-purple-500 rounded-full border-t-transparent animate-spin"></div>
         </div>
-        <p className="text-gray-500 font-medium">Loading modules...</p>
+        <p className="text-gray-500 font-medium">Loading units...</p>
       </div>
     );
   }
@@ -101,17 +101,17 @@ export default function ModulesList() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Modules</h1>
-          <p className="text-gray-500 mt-1">Manage your module content and settings</p>
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Units</h1>
+          <p className="text-gray-500 mt-1">Manage curriculum units and group related modules</p>
         </div>
         <Link
-          to="/modules/new"
+          to="/units/new"
           className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-medium rounded-xl shadow-lg hover:shadow-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 active:scale-[0.98]"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          Create Module
+          Create Unit
         </Link>
       </div>
 
@@ -121,42 +121,27 @@ export default function ModulesList() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
             <button
-              onClick={() => setFilters({ path_id: '', difficulty: '' })}
+              onClick={() => setFilters({ path_id: '' })}
               className="text-sm text-purple-600 hover:text-purple-700 font-medium transition-colors"
             >
               Clear All
             </button>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Learning Path</label>
-              <select
-                value={filters.path_id}
-                onChange={(e) => setFilters({ ...filters, path_id: e.target.value })}
-                className="select-base"
-              >
-                <option value="">All Paths</option>
-                {Object.entries(pathInfo).map(([key, info]) => (
-                  <option key={key} value={key}>{info.emoji} {info.name}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Difficulty</label>
-              <select
-                value={filters.difficulty}
-                onChange={(e) => setFilters({ ...filters, difficulty: e.target.value })}
-                className="select-base"
-              >
-                <option value="">All Levels</option>
-                {Object.entries(difficultyInfo).map(([key, info]) => (
-                  <option key={key} value={key}>{info.emoji} {info.name}</option>
-                ))}
-              </select>
-            </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Learning Path</label>
+            <select
+              value={filters.path_id}
+              onChange={(e) => setFilters({ path_id: e.target.value })}
+              className="select-base"
+            >
+              <option value="">All Paths</option>
+              {Object.entries(pathInfo).map(([key, info]) => (
+                <option key={key} value={key}>{info.emoji} {info.name}</option>
+              ))}
+            </select>
           </div>
           <p className="text-sm text-gray-500 mt-4">
-            Showing <span className="font-semibold text-gray-700">{filteredModules.length}</span> of <span className="font-semibold text-gray-700">{modules.length}</span> modules
+            Showing <span className="font-semibold text-gray-700">{filteredUnits.length}</span> of <span className="font-semibold text-gray-700">{units.length}</span> units
           </p>
         </div>
       </div>
@@ -171,15 +156,15 @@ export default function ModulesList() {
         </div>
       )}
 
-      {/* Modules Grid */}
-      {filteredModules.length > 0 ? (
+      {/* Units Grid */}
+      {filteredUnits.length > 0 ? (
         <div className="grid gap-4">
-          {filteredModules.map((module) => {
-            const path = pathInfo[module.path_id] || pathInfo[LearningPaths.PYTHON];
-            const difficulty = difficultyInfo[module.difficulty_level] || difficultyInfo.beginner;
+          {filteredUnits.map((unit) => {
+            const path = pathInfo[unit.path_id] || pathInfo[LearningPaths.PYTHON];
+            const moduleCount = unitModuleCounts[unit.id] || 0;
             return (
               <div
-                key={module.id}
+                key={unit.id}
                 className="card group hover:shadow-md transition-all duration-200"
               >
                 <div className="p-6">
@@ -192,35 +177,24 @@ export default function ModulesList() {
                           <span>{path.emoji}</span>
                           <span>{path.name}</span>
                         </div>
-                        <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r ${difficulty.color} text-white`}>
-                          <span>{difficulty.emoji}</span>
-                          <span>{difficulty.name}</span>
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-200">
+                          <span>Order: {unit.order}</span>
                         </div>
                       </div>
 
                       {/* Title & Description */}
-                      <h3 className="text-xl font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">{module.title}</h3>
-                      <p className="text-gray-600 mt-2 line-clamp-2">{module.description}</p>
+                      <h3 className="text-xl font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">{unit.title}</h3>
+                      {unit.description && (
+                        <p className="text-gray-600 mt-2 line-clamp-2">{unit.description}</p>
+                      )}
 
                       {/* Meta Info */}
-                      <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-gray-500">
+                      <div className="flex items-center gap-4 mt-4 text-sm text-gray-500">
                         <div className="flex items-center gap-1.5">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2m-6 5h6" />
                           </svg>
-                          <span>{module.duration_minutes} minutes</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          <span>${module.price_on_one} / ${module.price_group}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          <span>{module.objectives?.length || 0} objectives</span>
+                          <span>{moduleCount} modules</span>
                         </div>
                       </div>
                     </div>
@@ -228,7 +202,7 @@ export default function ModulesList() {
                     {/* Actions */}
                     <div className="flex items-center gap-2 lg:ml-4">
                       <Link
-                        to={`/modules/${module.id}/edit`}
+                        to={`/units/${unit.id}/edit`}
                         className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 font-medium rounded-xl hover:bg-blue-100 transition-colors"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -237,7 +211,7 @@ export default function ModulesList() {
                         Edit
                       </Link>
                       <button
-                        onClick={() => handleDelete(module.id)}
+                        onClick={() => handleDelete(unit.id)}
                         className="inline-flex items-center gap-2 px-4 py-2 bg-red-50 text-red-700 font-medium rounded-xl hover:bg-red-100 transition-colors"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -260,16 +234,16 @@ export default function ModulesList() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-1">No modules found</h3>
-            <p className="text-gray-500 mb-4">Create your first module to get started</p>
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">No units found</h3>
+            <p className="text-gray-500 mb-4">Create your first unit to organize your curriculum</p>
             <Link
-              to="/modules/new"
+              to="/units/new"
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-medium rounded-xl shadow-lg hover:shadow-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
-              Create Module
+              Create Unit
             </Link>
           </div>
         </div>

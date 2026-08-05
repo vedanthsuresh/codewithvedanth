@@ -22,10 +22,10 @@ export default function Navbar() {
             </li>
             <li>
               <Link
-                to="/lessons"
+                to="/syllabus"
                 className="text-gray-300 font-medium hover:text-purple-400 transition-colors duration-300"
               >
-                Lessons
+                Syllabus
               </Link>
             </li>
             <li>

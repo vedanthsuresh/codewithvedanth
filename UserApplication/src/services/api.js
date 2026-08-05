@@ -59,30 +59,7 @@ class APIService {
     return this.request(`/modules/${id}`);
   }
 
-  // Create new module
-  async createModule(moduleData) {
-    return this.request('/modules', {
-      method: 'POST',
-      body: JSON.stringify(moduleData),
-    });
-  }
-
-  // Update module
-  async updateModule(id, moduleData) {
-    return this.request(`/modules/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(moduleData),
-    });
-  }
-
-  // Delete module
-  async deleteModule(id) {
-    return this.request(`/modules/${id}`, {
-      method: 'DELETE',
-    });
-  }
-
-  // Units
+  // Get all units with optional filters
   async getUnits(filters = {}) {
     const params = new URLSearchParams();
     if (filters.path_id) params.append('path_id', filters.path_id);
@@ -90,30 +67,12 @@ class APIService {
     return this.request(`/modules/units${queryString ? `?${queryString}` : ''}`);
   }
 
+  // Get single unit by ID
   async getUnit(id) {
     return this.request(`/modules/units/${id}`);
   }
 
-  async createUnit(unitData) {
-    return this.request('/modules/units', {
-      method: 'POST',
-      body: JSON.stringify(unitData),
-    });
-  }
-
-  async updateUnit(id, unitData) {
-    return this.request(`/modules/units/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(unitData),
-    });
-  }
-
-  async deleteUnit(id) {
-    return this.request(`/modules/units/${id}`, {
-      method: 'DELETE',
-    });
-  }
-
+  // Get modules for a specific unit
   async getUnitModules(unitId) {
     return this.request(`/modules/units/${unitId}/modules`);
   }

@@ -22,14 +22,17 @@ export default function ModuleForm() {
   const [loading, setLoading] = useState(isEditing);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [units, setUnits] = useState([]);
 
   const [formData, setFormData] = useState({
     path_id: LearningPaths.PYTHON,
+    unit_id: '',
     title: '',
     description: '',
     difficulty_level: 'beginner',
     objectives: [''],
-    prerequisites: []
+    prerequisites: [],
+    order: 0
   });
 
   useEffect(() => {
@@ -37,6 +40,19 @@ export default function ModuleForm() {
       loadModule();
     }
   }, [id]);
+
+  useEffect(() => {
+    loadUnits();
+  }, [formData.path_id]);
+
+  const loadUnits = async () => {
+    try {
+      const data = await api.getUnits({ path_id: formData.path_id });
+      setUnits(data);
+    } catch (err) {
+      console.error('Failed to load units:', err);
+    }
+  };
 
   const loadModule = async () => {
     try {
@@ -186,6 +202,26 @@ export default function ModuleForm() {
                 </label>
               ))}
             </div>
+          </div>
+
+          {/* Unit */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Unit <span className="text-gray-400">(optional - groups related modules)</span>
+            </label>
+            <select
+              value={formData.unit_id || ''}
+              onChange={(e) => setFormData({ ...formData, unit_id: e.target.value || null })}
+              className="select-base"
+            >
+              <option value="">No Unit</option>
+              {units.map((unit) => (
+                <option key={unit.id} value={unit.id}>
+                  {unit.title} (Order: {unit.order})
+                </option>
+              ))}
+            </select>
+            <p className="text-sm text-gray-500 mt-1">Select a unit to group this module with related content</p>
           </div>
 
           {/* Title */}
@@ -342,6 +378,21 @@ export default function ModuleForm() {
                 </>
               )}
             </div>
+          </div>
+
+          {/* Order */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Order <span className="text-gray-400">(position within unit)</span>
+            </label>
+            <input
+              type="number"
+              value={formData.order}
+              onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
+              className="input-base"
+              min="0"
+            />
+            <p className="text-sm text-gray-500 mt-1">Lower numbers appear first</p>
           </div>
 
           {/* Actions */}

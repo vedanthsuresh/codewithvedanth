@@ -60,10 +60,10 @@ export default function Landing() {
               Claim Your Free Trial Class
             </Link>
             <Link
-              to="/lessons"
+              to="/syllabus"
               className="px-8 py-4 bg-transparent text-white border-2 border-purple-400 rounded-full font-semibold text-lg hover:bg-purple-600 hover:border-purple-600 transition-all duration-300"
             >
-              Explore Lessons
+              View Syllabus
             </Link>
           </motion.div>
         </motion.div>

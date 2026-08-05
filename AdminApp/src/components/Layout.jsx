@@ -7,12 +7,17 @@ export default function Layout({ children }) {
     if (path === '/modules') {
       return location.pathname === '/' || location.pathname.startsWith('/modules');
     }
+    if (path === '/units') {
+      return location.pathname.startsWith('/units');
+    }
     return location.pathname === path;
   };
 
   const navItems = [
     { path: '/modules', label: 'Modules', icon: '📚' },
     { path: '/modules/new', label: 'New Module', icon: '➕' },
+    { path: '/units', label: 'Units', icon: '📁' },
+    { path: '/units/new', label: 'New Unit', icon: '➕' },
   ];
 
   return (
