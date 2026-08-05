@@ -76,6 +76,28 @@ class APIService {
   async getUnitModules(unitId) {
     return this.request(`/modules/units/${unitId}/modules`);
   }
+
+  // ============ BOOKING ENDPOINTS ============
+
+  // Get available time slots for booking
+  async getAvailableTimeSlots() {
+    return this.request('/bookings/slots?available_only=true');
+  }
+
+  // Get time slot details
+  async getTimeSlotDetails(id) {
+    return this.request(`/bookings/slots/${id}`);
+  }
+
+  // Book a free trial slot
+  async bookFreeTrial(slotId, bookingData) {
+    // Include time_slot_id in the body as required by the API
+    const payload = { ...bookingData, time_slot_id: slotId };
+    return this.request(`/bookings/slots/${slotId}/book`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
 }
 
 export const api = new APIService();

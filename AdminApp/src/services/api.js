@@ -117,6 +117,59 @@ class APIService {
   async getUnitModules(unitId) {
     return this.request(`/modules/units/${unitId}/modules`);
   }
+
+  // ============ TIME SLOTS (Admin) ============
+
+  async getTimeSlotsAdmin(filters = {}) {
+    const params = new URLSearchParams();
+    if (filters.available_only !== undefined) {
+      params.append('available_only', filters.available_only);
+    }
+    const queryString = params.toString();
+    return this.request(`/bookings/admin/slots${queryString ? `?${queryString}` : ''}`);
+  }
+
+  async getTimeSlot(id) {
+    return this.request(`/bookings/slots/${id}`);
+  }
+
+  async createTimeSlot(slotData) {
+    return this.request('/bookings/admin/slots', {
+      method: 'POST',
+      body: JSON.stringify(slotData),
+    });
+  }
+
+  async updateTimeSlot(id, slotData) {
+    return this.request(`/bookings/admin/slots/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(slotData),
+    });
+  }
+
+  async deleteTimeSlot(id) {
+    return this.request(`/bookings/admin/slots/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // ============ BOOKINGS (Admin) ============
+
+  async getBookingsAdmin() {
+    return this.request('/bookings/admin/bookings');
+  }
+
+  async updateBookingStatus(id, status) {
+    return this.request(`/bookings/admin/bookings/${id}/status?status=${status}`, {
+      method: 'PUT',
+    });
+  }
+
+  async deleteBooking(id) {
+    return this.request(`/bookings/admin/bookings/${id}`, {
+      method: 'DELETE',
+    });
+  }
 }
 
 export const api = new APIService();

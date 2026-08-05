@@ -10,6 +10,9 @@ export default function Layout({ children }) {
     if (path === '/units') {
       return location.pathname.startsWith('/units');
     }
+    if (path === '/timeslots') {
+      return location.pathname.startsWith('/timeslots');
+    }
     return location.pathname === path;
   };
 
@@ -18,6 +21,9 @@ export default function Layout({ children }) {
     { path: '/modules/new', label: 'New Module', icon: '➕' },
     { path: '/units', label: 'Units', icon: '📁' },
     { path: '/units/new', label: 'New Unit', icon: '➕' },
+    { path: '/timeslots', label: 'Time Slots', icon: '⏰' },
+    { path: '/timeslots/new', label: 'New Slot', icon: '➕' },
+    { path: '/bookings', label: 'Booked Slots', icon: '📋' },
   ];
 
   return (

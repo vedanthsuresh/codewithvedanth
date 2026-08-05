@@ -54,7 +54,7 @@ export default function Landing() {
             variants={fadeInUp}
           >
             <Link
-              to="/register"
+              to="/book-trial"
               className="px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-full font-semibold text-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 hover:from-orange-400 hover:to-orange-500"
             >
               Claim Your Free Trial Class
@@ -273,7 +273,7 @@ export default function Landing() {
                 ))}
               </ul>
               <Link
-                to="/register"
+                to="/book-trial"
                 className="inline-block px-8 py-3 border-2 border-purple-600 text-purple-400 rounded-full font-semibold hover:bg-purple-600 hover:text-white transition-all duration-300"
               >
                 Get Started
@@ -364,7 +364,7 @@ export default function Landing() {
             transition={{ duration: 0.5 }}
           >
             <Link
-              to="/register"
+              to="/book-trial"
               className="inline-block px-10 py-5 bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-800 text-white rounded-full font-bold text-xl hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
             >
               Claim Your Free Trial Class

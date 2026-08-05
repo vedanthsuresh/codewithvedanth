@@ -46,7 +46,7 @@ export default function Navbar() {
             </li>
             <li>
               <Link
-                to="/register"
+                to="/book-trial"
                 className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-5 py-2 rounded-full font-medium hover:from-purple-500 hover:to-purple-600 hover:-translate-y-0.5 transition-all duration-300"
               >
                 Free Trial

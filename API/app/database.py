@@ -2,7 +2,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import IntegrityError
 from typing import List, Optional, Dict
-from app.models import ModuleORM, UnitORM, Module, Unit, ModuleCreate, ModuleUpdate, LearningPath
+from app.models import (
+    ModuleORM, UnitORM, TimeSlotORM, BookingORM,
+    Module, Unit, TimeSlot, Booking, BookingResponse, BookingListAdmin,
+    ModuleCreate, ModuleUpdate, LearningPath
+)
 
 # Database URL - SQLite for development
 # For production, use PostgreSQL: DATABASE_URL = "postgresql://user:password@localhost/dbname"
@@ -160,6 +164,212 @@ class Database:
             return False
 
         db.delete(unit)
+        db.commit()
+        return True
+
+    # ============ TIME SLOT CRUD OPERATIONS ============
+
+    def get_all_time_slots(self, db: Session, available_only: bool = False) -> List[TimeSlot]:
+        """Get all time slots, optionally filtered by availability"""
+        slots = db.query(TimeSlotORM).order_by(TimeSlotORM.date, TimeSlotORM.time).all()
+        if available_only:
+            # Filter by capacity
+            available_slots = []
+            for slot in slots:
+                booking_count = db.query(BookingORM).filter(
+                    BookingORM.time_slot_id == slot.id,
+                    BookingORM.status == "confirmed"
+                ).count()
+                if booking_count < slot.capacity:
+                    available_slots.append(slot)
+            return [s.to_pydantic(db) for s in available_slots]
+        return [s.to_pydantic(db) for s in slots]
+
+    def get_time_slot_by_id(self, db: Session, slot_id: str) -> Optional[TimeSlot]:
+        """Get a specific time slot by ID"""
+        slot = db.query(TimeSlotORM).filter(TimeSlotORM.id == slot_id).first()
+        return slot.to_pydantic(db) if slot else None
+
+    def create_time_slot(self, db: Session, slot_data: dict) -> TimeSlot:
+        """Create a new time slot"""
+        # Generate ID
+        counter = len(db.query(TimeSlotORM).all()) + 1
+        slot_id = f"ts-{counter:03d}"
+
+        # Add timestamps
+        from datetime import datetime
+        now = datetime.utcnow().isoformat()
+
+        # Create ORM model
+        slot_orm = TimeSlotORM(
+            id=slot_id,
+            created_at=now,
+            updated_at=now,
+            **slot_data
+        )
+
+        db.add(slot_orm)
+        db.commit()
+        db.refresh(slot_orm)
+
+        return slot_orm.to_pydantic(db)
+
+    def update_time_slot(self, db: Session, slot_id: str, updates: dict) -> Optional[TimeSlot]:
+        """Update an existing time slot"""
+        slot = db.query(TimeSlotORM).filter(TimeSlotORM.id == slot_id).first()
+        if not slot:
+            return None
+
+        # Check if reducing capacity below confirmed bookings
+        if 'capacity' in updates and updates['capacity'] is not None:
+            booking_count = db.query(BookingORM).filter(
+                BookingORM.time_slot_id == slot_id,
+                BookingORM.status == "confirmed"
+            ).count()
+            if updates['capacity'] < booking_count:
+                raise ValueError(f"Cannot reduce capacity below {booking_count} confirmed bookings")
+
+        for key, value in updates.items():
+            if value is not None and hasattr(slot, key):
+                setattr(slot, key, value)
+
+        # Update timestamp
+        from datetime import datetime
+        slot.updated_at = datetime.utcnow().isoformat()
+
+        db.commit()
+        db.refresh(slot)
+
+        return slot.to_pydantic(db)
+
+    def delete_time_slot(self, db: Session, slot_id: str) -> bool:
+        """Delete a time slot (prevents deletion if has confirmed bookings)"""
+        slot = db.query(TimeSlotORM).filter(TimeSlotORM.id == slot_id).first()
+        if not slot:
+            return False
+
+        # Check if has confirmed bookings
+        has_bookings = db.query(BookingORM).filter(
+            BookingORM.time_slot_id == slot_id,
+            BookingORM.status == "confirmed"
+        ).first()
+        if has_bookings:
+            raise ValueError("Cannot delete time slot with confirmed bookings")
+
+        db.delete(slot)
+        db.commit()
+        return True
+
+    # ============ BOOKING CRUD OPERATIONS ============
+
+    def get_all_bookings(self, db: Session) -> List[BookingListAdmin]:
+        """Get all bookings with admin details"""
+        bookings = db.query(BookingORM).order_by(BookingORM.booked_at.desc()).all()
+        result = []
+        for b in bookings:
+            slot = db.query(TimeSlotORM).filter(TimeSlotORM.id == b.time_slot_id).first()
+            booking_count = db.query(BookingORM).filter(
+                BookingORM.time_slot_id == b.time_slot_id,
+                BookingORM.status == "confirmed"
+            ).count()
+
+            booking_data = b.to_pydantic()
+            booking_data_dict = booking_data.model_dump()
+            booking_data_dict['time_slot_date'] = slot.date if slot else "N/A"
+            booking_data_dict['time_slot_time'] = slot.time if slot else "N/A"
+            booking_data_dict['bookings_count'] = booking_count
+            result.append(BookingListAdmin(**booking_data_dict))
+        return result
+
+    def get_bookings_for_user(self, db: Session, user_id: str) -> List[Booking]:
+        """Get all bookings for a specific user"""
+        bookings = db.query(BookingORM).filter(
+            BookingORM.user_id == user_id
+        ).order_by(BookingORM.booked_at.desc()).all()
+        return [b.to_pydantic() for b in bookings]
+
+    def get_bookings_for_slot(self, db: Session, slot_id: str) -> List[Booking]:
+        """Get all bookings for a specific time slot"""
+        bookings = db.query(BookingORM).filter(
+            BookingORM.time_slot_id == slot_id
+        ).order_by(BookingORM.booked_at).all()
+        return [b.to_pydantic() for b in bookings]
+
+    def get_booking_count_for_slot(self, db: Session, slot_id: str) -> int:
+        """Get count of confirmed bookings for a slot"""
+        return db.query(BookingORM).filter(
+            BookingORM.time_slot_id == slot_id,
+            BookingORM.status == "confirmed"
+        ).count()
+
+    def create_booking(self, db: Session, booking_data: dict) -> BookingResponse:
+        """Create a new booking"""
+        # Check slot exists and is available
+        slot = db.query(TimeSlotORM).filter(
+            TimeSlotORM.id == booking_data["time_slot_id"]
+        ).first()
+        if not slot:
+            raise ValueError("Time slot not found")
+
+        # Count existing confirmed bookings
+        booking_count = db.query(BookingORM).filter(
+            BookingORM.time_slot_id == slot.id,
+            BookingORM.status == "confirmed"
+        ).count()
+
+        if booking_count >= slot.capacity:
+            raise ValueError("Time slot is fully booked")
+
+        # Check for duplicate email in same slot
+        existing = db.query(BookingORM).filter(
+            BookingORM.time_slot_id == slot.id,
+            BookingORM.student_email == booking_data["student_email"],
+            BookingORM.status == "confirmed"
+        ).first()
+        if existing:
+            raise ValueError("You have already booked this time slot")
+
+        # Generate ID
+        counter = len(db.query(BookingORM).all()) + 1
+        booking_id = f"bk-{counter:03d}"
+
+        # Add timestamp
+        from datetime import datetime
+        now = datetime.utcnow().isoformat()
+
+        # Create ORM model
+        booking_orm = BookingORM(
+            id=booking_id,
+            booked_at=now,
+            status="confirmed",
+            **booking_data
+        )
+
+        db.add(booking_orm)
+        db.commit()
+        db.refresh(booking_orm)
+
+        # Return with nested time slot
+        return BookingResponse(
+            **booking_orm.to_pydantic().model_dump(),
+            time_slot=slot.to_pydantic(db)
+        )
+
+    def update_booking_status(self, db: Session, booking_id: str, status: str) -> bool:
+        """Update booking status"""
+        booking = db.query(BookingORM).filter(BookingORM.id == booking_id).first()
+        if not booking:
+            return False
+        booking.status = status
+        db.commit()
+        return True
+
+    def delete_booking(self, db: Session, booking_id: str) -> bool:
+        """Delete a booking"""
+        booking = db.query(BookingORM).filter(BookingORM.id == booking_id).first()
+        if not booking:
+            return False
+        db.delete(booking)
         db.commit()
         return True
 
