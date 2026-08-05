@@ -1,7 +1,7 @@
 const { onDocumentUpdated } = require('firebase-functions/v2/firestore');
 const { logger } = require('firebase-functions/v2');
 const { getFirestore } = require('firebase-admin/firestore');
-const { sendFollowUpEmail, sendCancellationEmail } = require('../emailService');
+const { sendFollowUpEmail, sendInstructorCancellationEmail } = require('../emailService');
 
 const db = getFirestore();
 
@@ -146,7 +146,7 @@ async function handleCancelledBooking(bookingId, bookingData, previousData) {
     }
 
     // Send cancellation email with slot date/time
-    const result = await sendCancellationEmail({
+    const result = await sendInstructorCancellationEmail({
       student_email: bookingData.student_email,
       student_name: bookingData.student_name,
       date: slotData.date || null,

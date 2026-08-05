@@ -253,6 +253,37 @@ async function sendCancellationEmail(bookingData) {
 }
 
 /**
+ * Send instructor-initiated cancellation email
+ * Used when the instructor/admin cancels a class (more apologetic tone)
+ * @param {Object} bookingData - Booking data
+ * @param {string} bookingData.student_email - Student's email
+ * @param {string} bookingData.student_name - Student's name
+ * @param {string} bookingData.date - Booking date
+ * @param {string} bookingData.time - Booking time
+ * @param {string} bookingData.reason - Cancellation reason (optional)
+ * @returns {Promise<Object>} Result with success flag
+ */
+async function sendInstructorCancellationEmail(bookingData) {
+  const { renderInstructorCancellationEmail } = require('./templates');
+
+  const { student_email, student_name, date, time, reason } = bookingData;
+
+  const html = renderInstructorCancellationEmail({
+    studentName: student_name,
+    date: formatDate(date),
+    time: formatTime(time),
+    reason: reason || null,
+  });
+
+  return sendEmail({
+    to: student_email,
+    subject: `Schedule Change: Your ${formatDate(date)} Class`,
+    html,
+    cc: [INSTRUCTOR_EMAIL],
+  });
+}
+
+/**
  * Format date for display in emails
  * @param {string|Date} date - Date to format
  * @returns {string} Formatted date
@@ -312,4 +343,5 @@ module.exports = {
   sendReminderEmail,
   sendFollowUpEmail,
   sendCancellationEmail,
+  sendInstructorCancellationEmail,
 };

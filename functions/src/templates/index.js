@@ -5,6 +5,7 @@ const { renderBookingConfirmation } = require('./bookingConfirmation');
 const { renderReminderEmail } = require('./reminder');
 const { renderFollowUpEmail } = require('./followUp');
 const { renderCancellationEmail } = require('./cancellation');
+const { renderInstructorCancellationEmail } = require('./instructorCancellation');
 
 module.exports = {
   renderWelcomeEmail,
@@ -12,4 +13,5 @@ module.exports = {
   renderReminderEmail,
   renderFollowUpEmail,
   renderCancellationEmail,
+  renderInstructorCancellationEmail,
 };
