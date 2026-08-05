@@ -301,17 +301,49 @@ class FirestoreService {
     }
   }
 
-  async getUserBookings(userId) {
+  async getUserBookings(userId, userEmail) {
     try {
       const bookingsRef = collection(db, 'bookings');
-      const q = query(
-        bookingsRef,
-        where('user_id', '==', userId),
-        orderBy('booked_at', 'desc')
-      );
+      let bookings = [];
 
-      const snapshot = await getDocs(q);
-      const bookings = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      // Try to get bookings by user_id first
+      try {
+        const qByUserId = query(
+          bookingsRef,
+          where('user_id', '==', userId)
+        );
+        const snapshotByUserId = await getDocs(qByUserId);
+        bookings = snapshotByUserId.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      } catch (e) {
+        console.warn('Failed to query by user_id:', e);
+      }
+
+      // Also get bookings by email (for guest bookings that might be associated)
+      if (userEmail) {
+        try {
+          const qByEmail = query(
+            bookingsRef,
+            where('student_email', '==', userEmail)
+          );
+          const snapshotByEmail = await getDocs(qByEmail);
+          const emailBookings = snapshotByEmail.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+          // Merge and deduplicate by booking ID
+          const bookingMap = new Map();
+          bookings.forEach(b => bookingMap.set(b.id, b));
+          emailBookings.forEach(b => bookingMap.set(b.id, b));
+          bookings = Array.from(bookingMap.values());
+        } catch (e) {
+          console.warn('Failed to query by email:', e);
+        }
+      }
+
+      // Sort by booked_at descending
+      bookings.sort((a, b) => {
+        const dateA = new Date(a.booked_at || 0);
+        const dateB = new Date(b.booked_at || 0);
+        return dateB - dateA;
+      });
 
       // Fetch time slot details for each booking
       const bookingsWithSlots = await Promise.all(
@@ -331,6 +363,42 @@ class FirestoreService {
     } catch (error) {
       console.error('Error fetching user bookings:', error);
       throw new Error('Failed to fetch user bookings');
+    }
+  }
+
+  async cancelBooking(bookingId) {
+    try {
+      const bookingRef = doc(db, 'bookings', bookingId);
+      await updateDoc(bookingRef, {
+        status: 'cancelled',
+        cancelled_at: new Date().toISOString()
+      });
+      return { success: true };
+    } catch (error) {
+      console.error('Error cancelling booking:', error);
+      throw new Error('Failed to cancel booking');
+    }
+  }
+
+  async getStudentStatus(userId) {
+    try {
+      const docRef = doc(db, 'users', userId);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        return null;
+      }
+
+      const userData = docSnap.data();
+      return {
+        hasTakenTrial: userData.hasTakenTrial || false,
+        isPaidStudent: userData.isPaidStudent || false,
+        trialCompletedAt: userData.trialCompletedAt || null,
+        convertedAt: userData.convertedAt || null
+      };
+    } catch (error) {
+      console.error('Error fetching student status:', error);
+      throw new Error('Failed to fetch student status');
     }
   }
 }
