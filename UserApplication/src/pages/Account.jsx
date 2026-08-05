@@ -52,77 +52,90 @@ export default function Account() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-8">
+    <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">My Account</h1>
-        <p className="text-gray-500 mt-1">Manage your profile and bookings</p>
+      <div className="mb-10">
+        <h1 className="text-3xl font-bold text-white tracking-tight">My Account</h1>
+        <p className="text-gray-400 mt-1">Manage your profile and bookings</p>
       </div>
 
       {/* User Info Card */}
-      <div className="card mb-6">
-        <div className="p-6">
-          <div className="flex items-center justify-between">
+      <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl p-8 mb-8">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/20">
+              <span className="text-3xl">👤</span>
+            </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-xl font-semibold text-white">
                 {user?.displayName || 'Student'}
               </h2>
-              <p className="text-gray-500">{user?.email}</p>
+              <p className="text-gray-400">{user?.email}</p>
             </div>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 text-gray-600 hover:text-gray-900 font-medium rounded-xl hover:bg-gray-100 transition-all duration-200"
-            >
-              Log Out
-            </button>
           </div>
+          <button
+            onClick={handleLogout}
+            className="px-5 py-2.5 text-gray-300 hover:text-white font-medium rounded-xl hover:bg-slate-800 transition-all duration-200 border border-slate-700 hover:border-slate-600"
+          >
+            Log Out
+          </button>
         </div>
       </div>
 
       {/* My Bookings */}
-      <div className="card">
-        <div className="p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">My Bookings</h2>
+      <div className="bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-2xl p-8">
+        <h2 className="text-xl font-semibold text-white mb-6">My Bookings</h2>
 
-          {loading ? (
-            <div className="flex justify-center py-8">
-              <div className="relative">
-                <div className="w-12 h-12 border-4 border-gray-200 rounded-full"></div>
-                <div className="absolute top-0 left-0 w-12 h-12 border-4 border-purple-500 rounded-full border-t-transparent animate-spin"></div>
-              </div>
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="relative">
+              <div className="w-12 h-12 border-4 border-slate-700 rounded-full"></div>
+              <div className="absolute top-0 left-0 w-12 h-12 border-4 border-purple-500 rounded-full border-t-transparent animate-spin"></div>
             </div>
-          ) : bookings.length > 0 ? (
-            <div className="space-y-4">
-              {bookings.map((booking) => (
-                <div key={booking.id} className="border border-gray-200 rounded-xl p-4">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-semibold text-gray-900">
-                        Free Trial Class
-                      </h3>
-                      <p className="text-gray-600">
-                        {formatDate(booking.date)} at {formatTime(booking.time)}
-                      </p>
-                      <p className="text-sm text-gray-500 mt-1">
-                        Status: <span className="font-medium text-green-600">Confirmed</span>
-                      </p>
-                    </div>
+          </div>
+        ) : bookings.length > 0 ? (
+          <div className="space-y-4">
+            {bookings.map((booking) => (
+              <div key={booking.id} className="bg-slate-800/50 border border-slate-700 rounded-xl p-5 hover:border-slate-600 transition-all duration-200">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-semibold text-white mb-1">
+                      Free Trial Class
+                    </h3>
+                    <p className="text-gray-400">
+                      {formatDate(booking.date)} at {formatTime(booking.time)}
+                    </p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      Status: <span className="font-medium text-green-400">Confirmed</span>
+                    </p>
+                  </div>
+                  <div className="px-3 py-1 bg-green-500/10 border border-green-500/20 text-green-400 text-sm font-medium rounded-full">
+                    Upcoming
                   </div>
                 </div>
-              ))}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
             </div>
-          ) : (
-            <div className="text-center py-8">
-              <p className="text-gray-500 mb-4">You haven't booked any classes yet.</p>
-              <button
-                onClick={() => window.location.href = '/#book-trial'}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-500 to-purple-600 text-white font-medium rounded-xl shadow-lg hover:shadow-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200"
-              >
-                Book Your Free Trial
-              </button>
-            </div>
-          )}
-        </div>
+            <h3 className="text-lg font-semibold text-white mb-2">No bookings yet</h3>
+            <p className="text-gray-400 mb-6">Book your free trial class to get started!</p>
+            <button
+              onClick={() => window.location.href = '/book-trial'}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-medium rounded-xl shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30 hover:from-purple-600 hover:to-indigo-700 transition-all duration-200"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Book Your Free Trial
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
