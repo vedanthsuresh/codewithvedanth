@@ -1,6 +1,9 @@
 const { onDocumentCreated } = require('firebase-functions/v2/firestore');
 const { logger } = require('firebase-functions/v2');
+const { getFirestore } = require('firebase-admin/firestore');
 const { sendBookingConfirmationEmail } = require('../emailService');
+
+const db = getFirestore();
 
 /**
  * Firestore trigger: Send booking confirmation email when a new booking is created
@@ -16,7 +19,7 @@ exports.onBookingCreated = onDocumentCreated('bookings/{bookingId}', async (even
   }
 
   const bookingId = event.params.bookingId;
-  const { student_email, student_name, date, time, lesson_type, is_paid_lesson } = bookingData;
+  const { student_email, student_name, lesson_type, is_paid_lesson } = bookingData;
 
   logger.info(`New booking created: ${bookingId}, email: ${student_email}`);
 
@@ -28,11 +31,23 @@ exports.onBookingCreated = onDocumentCreated('bookings/{bookingId}', async (even
 
   // Send booking confirmation email
   try {
+    // Fetch time slot details for date/time
+    const slotRef = db.collection('time_slots').doc(bookingData.time_slot_id);
+    const slotSnap = await slotRef.get();
+
+    let slotData = {};
+    if (slotSnap.exists) {
+      slotData = slotSnap.data();
+      logger.info(`Retrieved time slot: ${slotData.date} at ${slotData.time}`);
+    } else {
+      logger.warn(`Time slot ${bookingData.time_slot_id} not found for booking ${bookingId}`);
+    }
+
     const result = await sendBookingConfirmationEmail({
       student_email,
       student_name,
-      date,
-      time,
+      date: slotData.date || null,
+      time: slotData.time || null,
       lesson_type,
       is_paid_lesson,
     });
